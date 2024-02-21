@@ -1,4 +1,4 @@
-# TYPHOON-2-
+# TYPHOON-2
 ADSB &amp; ATC Interceptor for SIGINT &amp; IMINT Missions.
 
 Typhoon 2 is software that allows the interception of signals using an open-source ADSB decoder and transcribes them onto an interactive map. 
