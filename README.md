@@ -12,6 +12,8 @@ It is important to note that the use of Software-Defined Radio (SDR) may be subj
 
 ![X2](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/7401b5bf-45e5-4ba6-a933-3e56b7c1a360)
 
+# ABOUT
+
 The overlay of maps allows for precise analysis of areas and displays the map in geographical mode, adding location information on top. (Sensitive zones are not necessarily blurred on the maps)
 
 
