@@ -9,3 +9,9 @@ The interactive map supports various analysis methods, such as image overlay, an
 # DISCLAIMER
 
 It is important to note that the use of Software-Defined Radio (SDR) may be subject to local and international regulations. The reception and transmission of radio signals may be governed by telecommunications laws, privacy laws, and other rules specific to each region. Before engaging in any SDR-related activity, it is strongly recommended to comply with the laws in force in your jurisdiction and obtain all necessary permissions. Unauthorized use of SDR may lead to legal sanctions and severe consequences. The information provided here does not constitute legal advice and should not be interpreted as such. Always refer to local laws and consult legal experts to ensure compliance with all applicable regulations.
+
+![X2](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/7401b5bf-45e5-4ba6-a933-3e56b7c1a360)
+
+The overlay of maps allows for precise analysis of areas and displays the map in geographical mode, adding location information on top. Sensitive zones are not necessarily blurred on the maps.
+
+![xcxc](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/da1d4f9b-973f-4920-a86f-55a432e44794)
