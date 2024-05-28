@@ -10,7 +10,8 @@ The interactive map supports various analysis methods, such as image overlay, an
 
 It is important to note that the use of Software-Defined Radio (SDR) may be subject to local and international regulations. The reception and transmission of radio signals may be governed by telecommunications laws, privacy laws, and other rules specific to each region. Before engaging in any SDR-related activity, it is strongly recommended to comply with the laws in force in your jurisdiction and obtain all necessary permissions. Unauthorized use of SDR may lead to legal sanctions and severe consequences. The information provided here does not constitute legal advice and should not be interpreted as such. Always refer to local laws and consult legal experts to ensure compliance with all applicable regulations.
 
-![X2](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/7401b5bf-45e5-4ba6-a933-3e56b7c1a360)
+![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
+
 
 # ABOUT
 
