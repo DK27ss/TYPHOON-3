@@ -13,10 +13,9 @@ It is important to note that the use of Software-Defined Radio (SDR) may be subj
 ![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
 
 
-# ABOUT
+# SUPERPOSE INVESTIGATION
 
 The overlay of maps allows for precise analysis of areas and displays the map in geographical mode, adding location information on top. (Sensitive zones are not necessarily blurred on the maps)
-
 
 ![xxx](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/0584fc99-35d2-46ff-9999-1fc4cf144447)
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
