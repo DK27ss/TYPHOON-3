@@ -26,13 +26,24 @@ this mode provides very precise information (mountain names, altitude, airports,
 
 # USAGE ⚙️
 
+To install the required files correctly :
+
     git clone https://github.com/DK27ss/TYPHOON-2
     cd TYPHOON-2
     python -m venv env
     source env/bin/activate (Linux)
     env\Scripts\activate (Windows)
     pip install -r requirements.txt
-    Run / python or python3 TYPHOON2.py
+
+To launch the parent application (TYPHOON2) :
+
+    python or python3 TYPHOON2.py
+
+To launch the ADSB LISTENER (Dump1090 Decoder) :
+
+    python ./dump1090.py --interactive --net
+
+To view the interactive map on the localhost (127.0.0.1:8080) you can launch it using the map button in the parent application or directly enter the address in a search engine.
 
 # ABOUT 📑
 
