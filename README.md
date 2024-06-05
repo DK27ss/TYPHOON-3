@@ -32,7 +32,6 @@ To install the required files correctly :
     cd TYPHOON-2
     python -m venv env
     source env/bin/activate (Linux)
-    env\Scripts\activate (Windows)
     pip install -r requirements.txt
 
 To launch the parent application (TYPHOON2) :
