@@ -31,7 +31,7 @@ To install the required files correctly :
     git clone https://github.com/DK27ss/TYPHOON-2
     cd TYPHOON-2
     python -m venv env
-    source env/bin/activate (Linux)
+    source env/bin/activate
     pip install -r requirements.txt
 
 To launch the parent application (TYPHOON2) :
