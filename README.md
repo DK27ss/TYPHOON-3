@@ -24,4 +24,20 @@ this mode provides very precise information (mountain names, altitude, airports,
 
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
 
+# USAGE ⚙️
+
+1. Clone the repository 'git clone https://github.com/DK27ss/TYPHOON-2'
+2. Install dependecies 'pip install -r requirements.txt'
+
 # ABOUT 📑
+
+MIT License
+
+Copyright (c) [2024] [SUPERPOSE INT]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
