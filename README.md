@@ -26,8 +26,13 @@ this mode provides very precise information (mountain names, altitude, airports,
 
 # USAGE ⚙️
 
-1. Clone the repository 'git clone https://github.com/DK27ss/TYPHOON-2'
-2. Install dependecies 'pip install -r requirements.txt'
+    git clone https://github.com/DK27ss/TYPHOON-2
+    cd TYPHOON-2
+    python -m venv env
+    source env/bin/activate (Linux)
+    env\Scripts\activate (Windows)
+    pip install -r requirements.txt
+    Run / python or python3 TYPHOON2.py
 
 # ABOUT 📑
 
