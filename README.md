@@ -22,13 +22,13 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 This mode provides very precise information :
         
-        - mountain names 
-        - altitude 
-        - airports 
-        - roads 
-        - harbours
-        - buildings
-        - and more..
+        - mountain names                                            ___
+        - altitude                                              , | l |     SIGINT & IMINT
+        - airports                                             (( | l | ))      MISSIONS.
+        - roads                                                   | l | '   
+        - harbours                                                 \_/    By @makaki22
+        - buildings                                               /...\--.   _  
+        - and more..                                              =====  `--(_=
 
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
 
