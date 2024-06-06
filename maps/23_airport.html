@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+    <style type="text/css">
+        html {
+            height: 100%
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0
+        }
+
+        .plane-icon {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .blue-background {
+            background-color: #212d38;
+        }
+
+        #toggleCoordsButton {
+            padding: 5px;
+            background-color: #212d38;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            margin-top: 0px;
+            margin-left: 50px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        #map_canvas {
+            height: 100%;
+            background-color: #1a1a1a; /* Couleur de fond foncée */
+        }
+
+        #info {
+            position: absolute;
+            width: 20%;
+            height: 100%;
+            bottom: 0px;
+            right: 0px;
+            top: 0px;
+            background-color: #2c3e50; /* Couleur de fond foncée */
+            border-left: 1px #666 solid;
+            font-family: Helvetica;
+        }
+
+        #info div {
+            padding: 0px;
+            padding-left: 10px;
+            margin: 0px;
+        }
+
+        #info div h1 {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #ffffff; /* Couleur du texte claire */
+        }
+
+        #info div p {
+            font-size: 14px;
+            color: #ffffff; /* Couleur du texte claire */
+        }
+
+        #testContainer {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        #testText {
+            margin-right: 7px;
+            color: #ffffff; /* Couleur du texte claire */
+        }
+
+        #testButton,
+        #testButton2 {
+            padding: 5px;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px; /* Ajout d'une marge à droite de 10 pixels entre les boutons */
+        }
+        #superpose {
+            padding: 5px;
+            background-color: rgb(233, 233, 8);
+            color: #000000;
+            cursor: pointer;
+            border: none;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+        #cycview {
+            padding: 5px;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            margin-top: -69px;
+            margin-left: -43px;
+            border-radius: 5px;
+        }
+        #humview {
+            padding: 5px;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            margin-top: -69px;
+            margin-left: -80px;
+            border-radius: 5px;
+        }
+        #clearButton {
+            padding: 5px;
+            background-color: #212d38;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            margin-top: -69px;
+            margin-left: -133px;
+            border-radius: 5px;
+        }
+        #activationStatus {
+            margin-top: 1px;
+            margin-left: 100px;
+            font-weight: bold;
+            font-size: 12px; /* Taille de police réduite */
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+    <script type="text/javascript">
+        var Map = null;
+        var Planes = {};
+        var NumPlanes = 0;
+        var openStreetMapLayer, cyc_openStreetMapLayer, googleMapsLayer, cyc_transparentLayer, hum_transparentLayer, street_transparentLayer;
+        var currentView = {
+            lat: 37.0,
+            lon: 13.0,
+            zoom: 8
+        };
+        Selected = null;
+
+        var activationStatus = false;
+
+        function getIconForPlane(plane) {
+            var r = 255, g = 255, b = 0;
+            var maxalt = 40000; /* Max altitude in the average case */
+            var invalt = maxalt-plane.altitude;
+            var selected = (Selected == plane.hex);
+
+            if (invalt < 0) invalt = 0;
+            b = parseInt(255/maxalt*invalt);
+
+            /* As Icon we use the plane emoji, this is a simple solution but
+               is definitely a compromise: we expect the icon to be rotated
+               45 degrees facing north-east by default, this is true in most
+               systems but not all. */
+            var he = document.createElement("P");
+            he.innerHTML = '>';
+            var rotation = 45+360-plane.track;
+            var selhtml = '';
+
+            /* Give a border to the selected plane. */
+            if (Selected == plane.hex) {
+                selhtml = 'border:1px dotted #0000aa; border-radius:10px;';
+            } else {
+                selhtml = '';
+            }
+
+            var infoHtml = `
+                <div style="color: yellow; ${selhtml}">
+                    <div style="margin-top: 5px;">
+                    🛩
+                    <div style="margin-top: 5px;">
+                        ${plane.flight.length ? `<div><b></b> <b>${plane.flight}</b></div>` : ''}
+                        <div><b>ICAO:</b> ${plane.hex}</div>
+                    </div>
+                </div>`;
+
+            var icon = L.divIcon({ html: infoHtml, className: 'plane-icon' });
+            return icon;
+        }
+
+        function selectPlane(planehex) {
+            if (!Planes[planehex]) return;
+            var old = Selected;
+            Selected = planehex;
+            if (Planes[old]) {
+                Planes[old].marker.setIcon(getIconForPlane(Planes[old]));
+            }
+            Planes[Selected].marker.setIcon(getIconForPlane(Planes[Selected]));
+            refreshSelectedInfo();
+        }
+
+        function selectPlaneCallback(hex) {
+            return function() {
+                return selectPlane(hex);
+            }
+        }
+
+        function refreshGeneralInfo() {
+            var i = document.getElementById('geninfo');
+
+            i.innerHTML = NumPlanes+' planes on screen.';
+        }
+
+        function refreshSelectedInfo() {
+            var i = document.getElementById('selinfo');
+            var p = Planes[Selected];
+
+            if (!p) return;
+            var html = '<b>ICAO: </b>'+p.hex+'<br>';
+            if (p.flight.length) {
+                html += '<b>Code: </b>' + '<b>'+p.flight+'</b><br>';
+            }
+            html += '<b>Altitude: </b>'+p.altitude+' feet<br>';
+            html += '<b>Speed: </b>'+p.speed+' knots<br>';
+            html += '<b>Coordinates: </b>'+p.lat+', '+p.lon+'<br>';
+            i.innerHTML = html;
+
+            var latitudeSpan = document.getElementById('latitude');
+            var longitudeSpan = document.getElementById('longitude');
+            latitudeSpan.innerText = p.lat;
+            longitudeSpan.innerText = p.lon;
+        }
+
+        function fetchData() {
+            $.getJSON('/data.json', function(data) {
+                var stillhere = {}
+                for (var j=0; j < data.length; j++) {
+                    var plane = data[j];
+                    var marker = null;
+                    stillhere[plane.hex] = true;
+                    plane.flight = $.trim(plane.flight);
+
+                    if (Planes[plane.hex]) {
+                        var myplane = Planes[plane.hex];
+                        marker = myplane.marker;
+                        marker.setLatLng([plane.lat,plane.lon]);
+                        marker.setIcon(getIconForPlane(plane));
+                        myplane.altitude = plane.altitude;
+                        myplane.speed = plane.speed;
+                        myplane.lat = plane.lat;
+                        myplane.lon = plane.lon;
+                        myplane.track = plane.track;
+                        myplane.flight = plane.flight;
+                        if (myplane.hex == Selected)
+                            refreshSelectedInfo();
+                    } else {
+                        var icon = getIconForPlane(plane);
+                        var marker = L.marker([plane.lat, plane.lon], {icon: icon}).addTo(Map);
+                        var hex = plane.hex;
+                        marker.on('click',selectPlaneCallback(plane.hex));
+                        plane.marker = marker;
+                        marker.planehex = plane.hex;
+                        Planes[plane.hex] = plane;
+                    }
+                }
+                NumPlanes = data.length;
+
+                for (var p in Planes) {
+                    if (!stillhere[p]) {
+                        Map.removeLayer(Planes[p].marker);
+                        delete Planes[p];
+                    }
+                }
+            });
+        }
+
+        function updateMouseCoordinates(e) {
+            var latitudeSpan = document.getElementById('latitude');
+            var longitudeSpan = document.getElementById('longitude');
+            latitudeSpan.innerText = e.latlng.lat.toFixed(6);
+            longitudeSpan.innerText = e.latlng.lng.toFixed(6);
+        }
+
+        function toggleCoords() {
+            var coordsInfo = document.getElementById('coordsInfo');
+            coordsInfo.style.display = (coordsInfo.style.display === 'none' || coordsInfo.style.display === '') ? 'block' : 'none';
+
+            // Ajout ou suppression du gestionnaire d'événements en fonction de l'état du bouton
+            if (coordsInfo.style.display === 'block') {
+                Map.on('mousemove', updateMouseCoordinates);
+            } else {
+                Map.off('mousemove', updateMouseCoordinates);
+            }
+        }
+
+
+
+
+
+
+        function initialize() {
+            Map = L.map('map_canvas').setView([currentView.lat, currentView.lon], currentView.zoom);
+
+            window.setInterval(function () {
+                fetchData();
+                refreshGeneralInfo();
+            }, 100);
+
+            openStreetMapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'TYPHOON ©️ SUPERPOSE T.'
+            });
+
+            cyc_openStreetMapLayer = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+                attribution: 'TYPHOON ©️ SUPERPOSE T.'
+            });
+
+            hum_openStreetMapLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                attribution: 'TYPHOON ©️ SUPERPOSE T.'
+            });
+
+            googleMapsLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 21,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: 'TYPHOON ©️ SUPERPOSE T.'
+            });
+
+            cyc_transparentLayer = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+                opacity: 1,
+                attribution: 'TYPHOON ©️ SUPERPOSE T.'
+            });
+
+            hum_transparentLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                opacity: 1,
+                attribution: 'TYPHOON ©️ SUPERPOSE T.'
+            });
+
+            street_transparentLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                opacity: 0.5,
+                attribution: 'TYPHOON ©️ SUPERPOSE T.'
+            });
+
+            var baseLayers = {
+                "CYCLOSM INFOS MAP": cyc_openStreetMapLayer,
+                "ADSBx INFOS MAP": openStreetMapLayer,
+                "SATTELITE MAP": googleMapsLayer
+            };
+            
+            L.control.layers(baseLayers).addTo(Map);
+
+            var cdg_airport_custom = L.divIcon({
+                className: 'cdg_custom-marker',
+                html: '<div class="icon-content">🗼LFPG</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var cdg_airport_custom_style = document.createElement('style');
+            cdg_airport_custom_style.innerHTML = '.cdg_custom-marker .icon-content { background-color: #E82900; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(cdg_airport_custom_style);
+
+            var cdg_airport = L.marker([49.0083899664, 2.53844117956], { icon: cdg_airport_custom }).addTo(Map);
+            cdg_airport.bindPopup(
+                '<br><strong>Charles de Gaulle AIRPORT (CDG)</strong></br><br>' +
+                'IATA CODE: CDG<br>' +
+                'ICAO CODE: LFPG<br>' +
+                'CITY: Roissy-en-France, France<br>' +
+                'AIRPORT TYPE: International<br><br>' +
+                'Latitude: 49.0083899664<br>' +
+                'Longitude: 2.53844117956<br><br>'
+            ).openPopup();
+
+            cdg_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +  // Ajout de la classe pour le fond bleu
+                    '<p><b>Charles de Gaulle AIRPORT (CDG)</b></p>' +
+                    '<p><b>IATA CODE:</b> CDG</p>' +
+                    '<p><b>ICAO CODE:</b> LFPG</p>' +
+                    '<p><b>City:</b> Roissy-en-France, France</p>' +
+                    '<p><b>Airport Type:</b> International</p>' +
+                    '<p><b>Latitude:</b> 49.0083899664</p>' +
+                    '<p><b>Longitude:</b> 2.53844117956</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/search/?icao=2770" target="_blank" ' +
+                    'style="padding: 2px; background-color: #E0340F; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    'NO LISTENING FOUND</a>' +
+                    '</div>';  // Fermeture de la balise div avec la classe blue-background
+
+                updateSidebar(sidebarContent);
+            });
+
+
+            var ory_airport_custom = L.divIcon({
+                className: 'ory_custom-marker',
+                html: '<div class="icon-content">🗼LFPO</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var ory_airport_custom_style = document.createElement('style');
+            ory_airport_custom_style.innerHTML = '.ory_custom-marker .icon-content { background-color: #1d96f3; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(ory_airport_custom_style);
+
+            var ory_airport = L.marker([48.7262433, 2.3652472], { icon: ory_airport_custom }).addTo(Map);
+            ory_airport.bindPopup(
+                '<br>Orly AIRPORT (ORY)</br><br>' +
+                'IATA CODE: ORY<br>' +
+                'ICAO CODE: LFPO<br>' +
+                'CITY: Paris-Orly, France<br>' +
+                'AIRPORT TYPE: International<br><br>' +
+                'Latitude: 48.7262433<br>' +
+                'Longitude: 2.3652472<br><br>'
+            ).openPopup();
+
+            ory_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Orly AIRPORT (ORY)</b></p>' +
+                    '<p><b>IATA CODE:</b> ORY</p>' +
+                    '<p><b>ICAO CODE:</b> LFPO</p>' +
+                    '<p><b>City:</b> Paris-Orly, France</p>' +
+                    '<p><b>Airport Type:</b> International</p>' +
+                    '<p><b>Latitude:</b> 48.7262433</p>' +
+                    '<p><b>Longitude:</b> 2.3652472</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?icao=lfpo&mount=lfpo3_twr" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN LFPO TOWER</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?icao=lfpo&mount=lfpo_dep" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN LFPO DEPARTURE</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=lfpo3_app&icao=lfpo" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN LFPO APPROACH</a>'; 
+
+                updateSidebar(sidebarContent);
+            });
+
+
+            var fklk_airport_custom = L.divIcon({
+                className: 'fklk_custom-marker',
+                html: '<div class="icon-content">🗼FKLK</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var fklk_airport_custom_style = document.createElement('style');
+            fklk_airport_custom_style.innerHTML = '.fklk_custom-marker .icon-content { background-color: #E82900; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(fklk_airport_custom_style);
+
+            var fklk_airport = L.marker([41.501, 9.098], { icon: fklk_airport_custom }).addTo(Map);
+            fklk_airport.bindPopup(
+                '<br>Figari AIRPORT (FSC)</br><br>' +
+                'IATA CODE: FSC<br>' +
+                'ICAO CODE: FKLK<br>' +
+                'CITY: Figari-Sud, Corse<br>' +
+                'AIRPORT TYPE: International<br><br>' +
+                'Latitude: 41.501<br>' +
+                'Longitude: 9.098<br><br>'
+            ).openPopup();
+
+            fklk_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Figari AIRPORT (FSC)</b></p>' +
+                    '<p><b>IATA CODE:</b> FSC</p>' +
+                    '<p><b>ICAO CODE:</b> FKLK</p>' +
+                    '<p><b>City:</b> Figari-Sud, Corse</p>' +
+                    '<p><b>Airport Type:</b> International</p>' +
+                    '<p><b>Latitude:</b> 41.501</p>' +
+                    '<p><b>Longitude:</b> 9.098</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/search/?icao=2770" target="_blank" ' +
+                    'style="padding: 2px; background-color: #E0340F; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    'NO LISTENING FOUND</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+
+            var khua_airport_custom = L.divIcon({
+                className: 'khua_custom-marker',
+                html: '<div class="icon-content">🗼KHUA</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var khua_airport_custom_style = document.createElement('style');
+            khua_airport_custom_style.innerHTML = '.khua_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(khua_airport_custom_style);
+
+            var khua_airport = L.marker([34.67866, -86.68479], { icon: khua_airport_custom }).addTo(Map);
+            khua_airport.bindPopup(
+                '<br>Redstone Army Air Field (KHUA)</br><br>' +
+                'IATA CODE: HUA<br>' +
+                'ICAO CODE: KHUA<br>' +
+                'CITY: Alabama, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 34.67866<br>' +
+                'Longitude: -86.68479<br><br>'
+            ).openPopup();
+
+            khua_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Redstone Army Air Field (KHUA)</b></p>' +
+                    '<p><b>IATA CODE:</b> HUA</p>' +
+                    '<p><b>ICAO CODE:</b> KHUA</p>' +
+                    '<p><b>City:</b> Alabama, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 34.67866</p>' +
+                    '<p><b>Longitude:</b> -86.68479</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=ztl_hsv" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block;">' +
+                    '📡 LISTEN KHUA TOWER</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+
+            var kins_airport_custom = L.divIcon({
+                className: 'kins_custom-marker',
+                html: '<div class="icon-content">🗼KINS</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kins_airport_custom_style = document.createElement('style');
+            kins_airport_custom_style.innerHTML = '.kins_custom-marker .icon-content { background-color: #E82900; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kins_airport_custom_style);
+
+            var kins_airport = L.marker([36.58634, -115.67737], { icon: kins_airport_custom }).addTo(Map);
+            kins_airport.bindPopup(
+                '<br>Creech Air Force Base (KINS)</br><br>' +
+                'IATA CODE: INS<br>' +
+                'ICAO CODE: KINS<br>' +
+                'CITY: Nevada, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 36.58634<br>' +
+                'Longitude: -115.6773<br><br>'
+            ).openPopup();
+
+            kins_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Creech Air Force Base (KINS)</b></p>' +
+                    '<p><b>IATA CODE:</b> INS</p>' +
+                    '<p><b>ICAO CODE:</b> KINS</p>' +
+                    '<p><b>City:</b> Nevada, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 36.58634</p>' +
+                    '<p><b>Longitude:</b> -115.6773</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/search/?icao=2770" target="_blank" ' +
+                    'style="padding: 2px; background-color: #E0340F; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    'NO LISTENING FOUND</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+
+            var kbkf_airport_custom = L.divIcon({
+                className: 'kbkf_custom-marker',
+                html: '<div class="icon-content">🗼KBKF</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kbkf_airport_custom_style = document.createElement('style');
+            kbkf_airport_custom_style.innerHTML = '.kbkf_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kbkf_airport_custom_style);
+
+            var kbkf_airport = L.marker([39.70176, -104.75196], { icon: kbkf_airport_custom }).addTo(Map);
+            kbkf_airport.bindPopup(
+                '<br>Buckley Space Force Base (KBKF)</br><br>' +
+                'IATA CODE: BFK<br>' +
+                'ICAO CODE: KBKF<br>' +
+                'CITY: Colorado, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 39.70176<br>' +
+                'Longitude: -104.75196<br><br>'
+            ).openPopup();
+
+            kbkf_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Buckley Space Force Base (KBKF)</b></p>' +
+                    '<p><b>IATA CODE:</b> BFK</p>' +
+                    '<p><b>ICAO CODE:</b> KBKF</p>' +
+                    '<p><b>City:</b> Colorado, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 39.70176</p>' +
+                    '<p><b>Longitude:</b> -104.75196</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kbkf1_twr&icao=kbkf" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KBKF TOWER (UHF)</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kbkf1_twr_vhf&icao=kbkf" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KBKF TOWER (VHF)</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kbkf1_twr_both&icao=kbkf" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KBKF TOWER (VHF/UHF)</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kbkf1_atis&icao=kbkf" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KBKF ATIS</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+
+
+            var kngu_airport_custom = L.divIcon({
+                className: 'kngu_custom-marker',
+                html: '<div class="icon-content">🗼KNGU</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kngu_airport_custom_style = document.createElement('style');
+            kngu_airport_custom_style.innerHTML = '.kngu_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kngu_airport_custom_style);
+
+            var kngu_airport = L.marker([36.93747, -76.28928], { icon: kngu_airport_custom }).addTo(Map);
+            kngu_airport.bindPopup(
+                '<br>Norfolk Naval Station (Chambers Field) (KNGU)</br><br>' +
+                'IATA CODE: NGU<br>' +
+                'ICAO CODE: KNGU<br>' +
+                'CITY: Virginia, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 36.93747<br>' +
+                'Longitude: -76.28928<br><br>'
+            ).openPopup();
+
+            kngu_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Norfolk Naval Station (Chambers Field) (KNGU)</b></p>' +
+                    '<p><b>IATA CODE:</b> NGU</p>' +
+                    '<p><b>ICAO CODE:</b> KNGU</p>' +
+                    '<p><b>City:</b> Virginia, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 36.93747</p>' +
+                    '<p><b>Longitude:</b> -76.28928</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kngu1" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KNGU DEL/GND/TWR</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+
+            var ksuu_airport_custom = L.divIcon({
+                className: 'ksuu_custom-marker',
+                html: '<div class="icon-content">🗼KSUU</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var ksuu_airport_custom_style = document.createElement('style');
+            ksuu_airport_custom_style.innerHTML = '.ksuu_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(ksuu_airport_custom_style);
+
+            var ksuu_airport = L.marker([38.26454, -121.92413], { icon: ksuu_airport_custom }).addTo(Map);
+            ksuu_airport.bindPopup(
+                '<br>Travis Air Force Base (KSUU)</br><br>' +
+                'IATA CODE: SUU<br>' +
+                'ICAO CODE: KSUU<br>' +
+                'CITY: California, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 38.26454<br>' +
+                'Longitude: -121.92413<br><br>'
+            ).openPopup();
+
+            ksuu_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Travis Air Force Base (KSUU)</b></p>' +
+                    '<p><b>IATA CODE:</b> SUU</p>' +
+                    '<p><b>ICAO CODE:</b> KSUU</p>' +
+                    '<p><b>City:</b> California, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 38.26454</p>' +
+                    '<p><b>Longitude:</b> -121.92413</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=ksuu&icao=ksuu" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KSUU DEL/GND/TWR/APP/MISC</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=ksuu_l&icao=ksuu" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KSUU DEL/GND/TWR/APP-SOUTH</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=ksuu_r&icao=ksuu" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KSUU APP-NORTH/MISC</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+
+
+            var kdov_airport_custom = L.divIcon({
+                className: 'kdov_custom-marker',
+                html: '<div class="icon-content">🗼KDOV</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kdov_airport_custom_style = document.createElement('style');
+            kdov_airport_custom_style.innerHTML = '.kdov_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kdov_airport_custom_style);
+
+            var kdov_airport = L.marker([39.12954, -75.46596], { icon: kdov_airport_custom }).addTo(Map);
+            kdov_airport.bindPopup(
+                '<br>Dover Air Force Base (KDOV)</br><br>' +
+                'IATA CODE: DOV<br>' +
+                'ICAO CODE: KDOV<br>' +
+                'CITY: Delaware, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 39.12954<br>' +
+                'Longitude: -75.46596<br><br>'
+            ).openPopup();
+
+            kdov_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Dover Air Force Base (KDOV)</b></p>' +
+                    '<p><b>IATA CODE:</b> DOV</p>' +
+                    '<p><b>ICAO CODE:</b> KDOV</p>' +
+                    '<p><b>City:</b> Delaware, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 39.12954</p>' +
+                    '<p><b>Longitude:</b> -75.46596</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kdov2_atis&icao=kdov" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KDOV ATIS</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kdov_del_gnd_twr&icao=kdov" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KDOV DEL/GND/TWR/APP</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kdov2_gnd_app&icao=kdov" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KDOV GND/APP</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kdov2_twr&icao=kdov" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KDOV TOWER</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kdov_zdc&icao=kdov" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KDOV ZDC19/53 KENTON/WOODSTOWN</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+            var klfi_airport_custom = L.divIcon({
+                className: 'klfi_custom-marker',
+                html: '<div class="icon-content">🗼KLFI</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var klfi_airport_custom_style = document.createElement('style');
+            klfi_airport_custom_style.innerHTML = '.klfi_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(klfi_airport_custom_style);
+
+            var klfi_airport = L.marker([37.08289, -76.36054], { icon: klfi_airport_custom }).addTo(Map);
+            klfi_airport.bindPopup(
+                '<br>Langley Air Force Base (KLFI)</br><br>' +
+                'IATA CODE: LFI<br>' +
+                'ICAO CODE: KLFI<br>' +
+                'CITY: Virginia, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 37.08289<br>' +
+                'Longitude: -76.36054<br><br>'
+            ).openPopup();
+
+            klfi_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Langley Air Force Base (KLFI)</b></p>' +
+                    '<p><b>IATA CODE:</b> LFI</p>' +
+                    '<p><b>ICAO CODE:</b> KLFI</p>' +
+                    '<p><b>City:</b> Virginia, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 37.08289</p>' +
+                    '<p><b>Longitude:</b> -76.36054</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=klfi&icao=klfi" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KLFI DEL/GND/TWR</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+
+            var kdma_airport_custom = L.divIcon({
+                className: 'kdma_custom-marker',
+                html: '<div class="icon-content">🗼KDMA</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kdma_airport_custom_style = document.createElement('style');
+            kdma_airport_custom_style.innerHTML = '.kdma_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kdma_airport_custom_style);
+
+            var kdma_airport = L.marker([32.16636, -110.88317], { icon: kdma_airport_custom }).addTo(Map);
+            kdma_airport.bindPopup(
+                '<br>Davis Monthan Air Force Base (KDMA)</br><br>' +
+                'IATA CODE: DMA<br>' +
+                'ICAO CODE: KDMA<br>' +
+                'CITY: Arizona, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 32.16636<br>' +
+                'Longitude: -110.88317<br><br>'
+            ).openPopup();
+
+            kdma_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Davis Monthan Air Force Base (KDMA)</b></p>' +
+                    '<p><b>IATA CODE:</b> DMA</p>' +
+                    '<p><b>ICAO CODE:</b> KDMA</p>' +
+                    '<p><b>City:</b> Arizona, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 32.16636</p>' +
+                    '<p><b>Longitude:</b> -110.88317</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=ktus&icao=kdma" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KDMA/KTUS TWR/OPS/ZAB</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/play/2707" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KTUS DEL/GND/TWR/APP/KDMA [DOWN]</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+            var kadw_airport_custom = L.divIcon({
+                className: 'kadw_custom-marker',
+                html: '<div class="icon-content">🗼KADW</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kadw_airport_custom_style = document.createElement('style');
+            kadw_airport_custom_style.innerHTML = '.kadw_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kadw_airport_custom_style);
+
+            var kadw_airport = L.marker([38.81083, -76.86705], { icon: kadw_airport_custom }).addTo(Map);
+            kadw_airport.bindPopup(
+                '<br>Joint Base Andrews (KADW)</br><br>' +
+                'IATA CODE: ADW<br>' +
+                'ICAO CODE: KADW<br>' +
+                'CITY: Maryland, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 38.81083<br>' +
+                'Longitude: -76.86705<br><br>'
+            ).openPopup();
+
+            kadw_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Joint Base Andrews (KADW)</b></p>' +
+                    '<p><b>IATA CODE:</b> ADW</p>' +
+                    '<p><b>ICAO CODE:</b> KADW</p>' +
+                    '<p><b>City:</b> Maryland, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 38.81083</p>' +
+                    '<p><b>Longitude:</b> -76.86705</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kdaa2_twr&icao=kadw" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KADW KDAA/KADW TOWER</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+
+            var kwri_airport_custom = L.divIcon({
+                className: 'kwri_custom-marker',
+                html: '<div class="icon-content">🗼KWRI</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kwri_airport_custom_style = document.createElement('style');
+            kwri_airport_custom_style.innerHTML = '.kwri_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kwri_airport_custom_style);
+
+            var kwri_airport = L.marker([40.01558, -74.5917], { icon: kwri_airport_custom }).addTo(Map);
+            kwri_airport.bindPopup(
+                '<br>McGuire Field (Air Force Base) (KWRI)</br><br>' +
+                'IATA CODE: WRI<br>' +
+                'ICAO CODE: KWRI<br>' +
+                'CITY: Maryland, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 40.01558<br>' +
+                'Longitude: -74.5917<br><br>'
+            ).openPopup();
+
+            kwri_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>McGuire Field (Air Force Base) (KWRI)</b></p>' +
+                    '<p><b>IATA CODE:</b> WRI</p>' +
+                    '<p><b>ICAO CODE:</b> KWRI</p>' +
+                    '<p><b>City:</b> Maryland, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 40.01558</p>' +
+                    '<p><b>Longitude:</b> -74.5917</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kblm1&icao=kwri" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KWRI KNEL/KWRI/ZNY</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+            var kmtc_airport_custom = L.divIcon({
+                className: 'kmtc_custom-marker',
+                html: '<div class="icon-content">🗼KMTC</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kmtc_airport_custom_style = document.createElement('style');
+            kmtc_airport_custom_style.innerHTML = '.kmtc_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kmtc_airport_custom_style);
+
+            var kmtc_airport = L.marker([42.61389, -82.83691], { icon: kmtc_airport_custom }).addTo(Map);
+            kmtc_airport.bindPopup(
+                '<br>Selfridge Air National Guard Field Base (KMTC)</br><br>' +
+                'IATA CODE: MTC<br>' +
+                'ICAO CODE: KMTC<br>' +
+                'CITY: Michigan, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 42.61389<br>' +
+                'Longitude: -82.83691<br><br>'
+            ).openPopup();
+
+            kmtc_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Selfridge Air National Guard Field Base (KMTC)</b></p>' +
+                    '<p><b>IATA CODE:</b> MTC</p>' +
+                    '<p><b>ICAO CODE:</b> KMTC</p>' +
+                    '<p><b>City:</b> Michigan, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 42.61389</p>' +
+                    '<p><b>Longitude:</b> -82.83691</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kmtc1_atis&icao=kmtc" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KMTC ATIS</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kmtc1_gnd_twr&icao=kmtc" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KMTC GROUND/TOWER</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kmtc1_app&icao=kmtc" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KMTC APPROACH/DEPARTURE</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=zob_alg1_gambshi&icao=kmtc" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KMTC ZOB SECTOR 19 GAMBLE HI</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=zob_alg1_dresdlo&icao=kmtc" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KMTC ZOB SECTOR 20 DRESDEN LOW</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=zob_alg1_lakehi&icao=kmtc" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KMTC ZOB SECTOR 26 LAKE HI</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=zob_alg1_hudhi&icao=kmtc" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KMTC ZOB SECTOR 27 HUDSON HI</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+            var kntu_airport_custom = L.divIcon({
+                className: 'kntu_custom-marker',
+                html: '<div class="icon-content">🗼KNTU</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kntu_airport_custom_style = document.createElement('style');
+            kntu_airport_custom_style.innerHTML = '.kntu_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kntu_airport_custom_style);
+
+            var kntu_airport = L.marker([36.82275, -76.03189], { icon: kntu_airport_custom }).addTo(Map);
+            kntu_airport.bindPopup(
+                '<br>Oceana Naval Air Station (Apollo Soucek Field) (KNTU)</br><br>' +
+                'IATA CODE: NTU<br>' +
+                'ICAO CODE: KNTU<br>' +
+                'CITY: Virginia, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 36.82275<br>' +
+                'Longitude: -76.03189<br><br>'
+            ).openPopup();
+
+            kntu_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Oceana Naval Air Station (Apollo Soucek Field) (KNTU)</b></p>' +
+                    '<p><b>IATA CODE:</b> NTU</p>' +
+                    '<p><b>ICAO CODE:</b> KNTU</p>' +
+                    '<p><b>City:</b> Virginia, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 36.82275</p>' +
+                    '<p><b>Longitude:</b> -76.03189</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/play/2770" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KNTU GIANT KILLER [DOWN]</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/play/2770" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KNTU GND/TWR/APP/RADAR [DOWN]</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+            var kchs_airport_custom = L.divIcon({
+                className: 'kchs_custom-marker',
+                html: '<div class="icon-content">🗼KCHS</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kchs_airport_custom_style = document.createElement('style');
+            kchs_airport_custom_style.innerHTML = '.kchs_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kchs_airport_custom_style);
+
+            var kchs_airport = L.marker([32.89864, -80.04053], { icon: kchs_airport_custom }).addTo(Map);
+            kchs_airport.bindPopup(
+                '<br>Charleston Air Force Base/International (KCHS)</br><br>' +
+                'IATA CODE: CHS<br>' +
+                'ICAO CODE: KCHS<br>' +
+                'CITY: South Carolina, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 32.89864<br>' +
+                'Longitude: -80.04053<br><br>'
+            ).openPopup();
+
+            kchs_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Charleston Air Force Base/International (KCHS)</b></p>' +
+                    '<p><b>IATA CODE:</b> CHS</p>' +
+                    '<p><b>ICAO CODE:</b> KCHS</p>' +
+                    '<p><b>City:</b> South Carolina, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 32.89864</p>' +
+                    '<p><b>Longitude:</b> -80.04053</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/play/asx/kchs.asx" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KCHS GND/TWR/APP</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+
+            var kluf_airport_custom = L.divIcon({
+                className: 'kluf_custom-marker',
+                html: '<div class="icon-content">🗼KLUF</div>',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+            });
+
+            var kluf_airport_custom_style = document.createElement('style');
+            kluf_airport_custom_style.innerHTML = '.kluf_custom-marker .icon-content { background-color: #f3ac1d; padding: 1px; border-radius: 4%; }';
+            document.head.appendChild(kluf_airport_custom_style);
+
+            var kluf_airport = L.marker([33.53496, -112.38321], { icon: kluf_airport_custom }).addTo(Map);
+            kluf_airport.bindPopup(
+                '<br>Luke Air Force Base (KLUF)</br><br>' +
+                'IATA CODE: LUF<br>' +
+                'ICAO CODE: KLUF<br>' +
+                'CITY: Arizona, United States<br>' +
+                'AIRPORT TYPE: Army<br><br>' +
+                'Latitude: 33.53496<br>' +
+                'Longitude: -112.38321<br><br>'
+            ).openPopup();
+
+            kluf_airport.on('click', function () {
+                var sidebarContent =
+                    '<div class="blue-background">' +
+                    '<p><b>Luke Air Force Base (KLUF)</b></p>' +
+                    '<p><b>IATA CODE:</b> LUF</p>' +
+                    '<p><b>ICAO CODE:</b> KLUF</p>' +
+                    '<p><b>City:</b> Arizona, United States</p>' +
+                    '<p><b>Airport Type:</b> Army</p>' +
+                    '<p><b>Latitude:</b> 33.53496</p>' +
+                    '<p><b>Longitude:</b> -112.38321</p>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kphx5_kluf_app&icao=kluf" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KLUF APPROACH/DEPARTURE</a>' +
+                    '<br>' +
+                    '<a href="https://www.liveatc.net/hlisten.php?mount=kphx5_kluf_gnd_twr&icao=kluf" target="_blank" ' +
+                    'style="padding: 2px; background-color: #5B9F22; color: #ffffff; ' +
+                    'text-decoration: none; border-radius: 1px; display: inline-block; margin-top: 5px;">' +
+                    '📡 LISTEN KLUF DEL/GND/TWR/MISC</a>';
+
+                updateSidebar(sidebarContent);
+            });
+
+        }
+
+        function clearSidebar() {
+            updateSidebar('');
+        }
+
+        function updateSidebar(content) {
+            var selectedInfo = document.getElementById('selinfo');
+            selectedInfo.innerHTML = content;
+        }
+
+
+
+        function updateSidebar(content) {
+            var selectedInfo = document.getElementById('selinfo');
+            selectedInfo.innerHTML = content;
+        }
+
+        
+
+        function updateActivationStatus() {
+            var statusText = document.getElementById('activationStatus');
+            statusText.innerText = activationStatus ? 'ENABLED' : 'DISABLED';
+            statusText.style.color = activationStatus ? 'green' : 'red';
+        }
+
+        function areas_infs() {
+            currentView = {
+                lat: Map.getCenter().lat,
+                lon: Map.getCenter().lng,
+                zoom: Map.getZoom()
+            };
+
+            Map.setView([currentView.lat, currentView.lon], currentView.zoom);
+            Map.removeLayer(googleMapsLayer);
+            openStreetMapLayer.addTo(Map);
+        }
+
+        function sat_vw() {
+            currentView = {
+                lat: Map.getCenter().lat,
+                lon: Map.getCenter().lng,
+                zoom: Map.getZoom()
+            };
+
+            Map.setView([currentView.lat, currentView.lon], currentView.zoom);
+            Map.removeLayer(cyc_openStreetMapLayer);
+            googleMapsLayer.addTo(Map);
+        }
+
+        function cyc_view() {
+            currentView = {
+                lat: Map.getCenter().lat,
+                lon: Map.getCenter().lng,
+                zoom: Map.getZoom()
+            };
+
+            Map.setView([currentView.lat, currentView.lon], currentView.zoom);
+            Map.removeLayer(openStreetMapLayer);
+            Map.removeLayer(googleMapsLayer);
+            Map.removeLayer(hum_transparentLayer);
+            cyc_openStreetMapLayer.addTo(Map);
+        }
+
+        function hum_view() {
+            currentView = {
+                lat: Map.getCenter().lat,
+                lon: Map.getCenter().lng,
+                zoom: Map.getZoom()
+            };
+
+            Map.setView([currentView.lat, currentView.lon], currentView.zoom);
+            Map.removeLayer(openStreetMapLayer);
+            Map.removeLayer(googleMapsLayer);
+            Map.removeLayer(cyc_openStreetMapLayer);
+            hum_openStreetMapLayer.addTo(Map);
+        }
+
+        function opac_filter() {
+            activationStatus = !activationStatus;
+            updateActivationStatus();
+
+            if (Map.hasLayer(cyc_transparentLayer, street_transparentLayer, hum_transparentLayer)) {
+                street_transparentLayer.remove()
+                cyc_transparentLayer.remove();
+                hum_transparentLayer.remove();
+                googleMapsLayer.setOpacity(1);
+            } else {
+                street_transparentLayer.addTo(Map);
+                cyc_transparentLayer.addTo(Map);
+//                hum_transparentLayer.addTo(Map);
+                googleMapsLayer.setOpacity(0.3);
+            }
+        }
+    </script>
+</head>
+
+<style>
+    #coordsInfo {
+        bottom: -5px;
+        left: 10%;
+        background-color: #212d38; /* Couleur de fond pour les coordonnées */
+        padding: -5px;
+    }
+</style>
+
+<body onload="initialize()">
+    <div id="map_canvas" style="width:80%; height:100%"></div>
+    <div id="info">
+        <div>
+            <h1>TYPHOON v3.0</h1>
+            <div id="testContainer">
+                <button id="toggleCoordsButton" onclick="toggleCoords()">CORDS</button>
+                <button id="testButton" onclick="areas_infs()">INFOS</button>
+                <button id="testButton2" onclick="sat_vw()">SAT</button>
+                <button id="superpose" onclick="opac_filter()">SUPERPOSE</button>
+                <button id="cycview" onclick="cyc_view()">CYC</button>
+                <button id="humview" onclick="hum_view()">HUM</button>
+                <button id="clearButton" onclick="clearSidebar()">CLEAR INFOS</button>
+                <span id="activationStatus"></span>
+            </div>
+            <p id="geninfo"></p>
+            <p id="selinfo">Click on aircraft for infos.</p>
+
+            <div id="coordsInfo" style="display: none;">
+                <p><b>Latitude:</b> <span id="latitude"></span></p>
+                <p><b>Longitude:</b> <span id="longitude"></span></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
