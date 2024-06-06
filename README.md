@@ -34,6 +34,47 @@ This mode provides very precise information :
 
 # USAGE ⚙️
 
+To install the USB driver for the SDR Dongle :
+
+    sudo apt-get -fym install git cmake build=essential libusb-1.0-0-dev
+
+To download the SDR dongle reception software (the folders will be created and installed automatically) :
+
+     mkdir git
+     git clone git://git.osmocom.org/rtl-sdr.git
+     cd rtl-sdr
+     mkdir build
+     cd build
+     cmake . -DINSTALL_UDEV_RULES=ON
+     sudo make install
+     sudo ldconfig
+     sudo cp ../rtl-sdr.rules /etc/udev.rules.d/
+
+Warning! In the event of a problem with CMAKE, and if you receive feedback indicating that it is not installed, type the following command to retrieve it, and then pick up where you left off :
+
+     sudo apt-get install cmake
+
+We're now going to disable the DVB driver. This is the driver used to receive television.
+It's of no interest to our experiment, as the frequency we'll be listening to is 1090 MHz. Way beyond TV frequencies.
+To do this, we need to create an exception file. Let's create it with the following command :
+
+     sudo nano /etc/modprobe.d/rtlsdr.conf
+
+A new black page opens. This is the text editor.
+Add the following line to add the DVB receiver to the driver blacklist :
+
+    blacklist dvb_usb_rtl28xxu
+
+To save the file, press CTRL-O and then ENTER.
+You can now close the text editor with the cross (or CTRL-X).
+
+Since the DVB driver was probably loaded once during installation, you'll need to remove it before continuing.
+Type the following command :
+
+    lsmod | grep dvb_usb_rtl28xxu
+
+The driver and listening software are now installed ^^
+
 To install the required files correctly :
 
     git clone https://github.com/DK27ss/TYPHOON-2
