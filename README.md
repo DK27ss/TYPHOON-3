@@ -94,6 +94,9 @@ To view the interactive map on the localhost (127.0.0.1:8080) you can launch it 
 
 # ABOUT 📑
 
+Buy me a Coffee ☕️ [ETH ARBITRUM ONLY 0xCeB10eEC23826DdCb14397dB855B9302D36822bE]
+If you would like to contribute to the development of the project, please contact me on my Telegram @makaki22 
+
 MIT License
 
 Copyright (c) [2024] [SUPERPOSE INT]
