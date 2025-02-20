@@ -1,6 +1,11 @@
 # TYPHOON-2
 ADSB &amp; ATC Interceptor for SIGINT (Signals Intelligence)&amp; IMINT (Imagery Intelligence) Missions.
 
+Bêta version 2.0
+Developped and maintained by [@DK27ss](https://github.com/DK27ss)
+
+## Description:
+
 Typhoon 2 is software that allows the interception of signals using an open-source ADSB (Automatic Dependent Surveillance-Broadcast) decoder and transcribes them onto an interactive map. 
 It also intercepts ATC (Air-Traffic-Control) communications, also sourced openly, and displays their locations on an interactive map.
 
@@ -14,7 +19,7 @@ It is important to note that the use of Software-Defined Radio (SDR) may be subj
 
 ![Capture2](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c433e357-fb3d-4c50-b140-42ee0bc9c0d5)
 
-# INVESTIGATION 🔍
+# Features:
 
 The overlay of maps allows for precise analysis of areas and displays the map in geographical mode, adding location information on top. (Sensitive zones are not necessarily blurred on the maps)
 
@@ -22,17 +27,17 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 This mode provides very precise information :
         
-        - mountain names                                            ___
+        - mountain                                                 ___
         - altitude                                              , | l |     SIGINT & IMINT
-        - airports                                             (( | l | ))      MISSIONS.
+        - airports                                             (( | 0 | ))      MISSIONS.
         - roads                                                   | l | '   
         - harbours                                                 \_/    By @makaki22
-        - buildings                                               /...\--.   _  
-        - and more..                                              =====  `--(_=
+        - buildings                                               /...\--.   _ 
+        - and more..                                              =====  `--(_===__===..
 
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
 
-# USAGE ⚙️
+## Usage:
 
 To install the USB driver for the SDR Dongle :
 
@@ -92,9 +97,8 @@ To launch the ADSB LISTENER (Dump1090 Decoder) :
 
 To view the interactive map on the localhost (127.0.0.1:8080) you can launch it using the map button in the parent application or directly enter the address in a search engine.
 
-# ABOUT 📑
+## About
 
-Buy me a Coffee ☕️ ETH ARBITRUM ONLY 0xCeB10eEC23826DdCb14397dB855B9302D36822bE
 If you would like to contribute to the development of the project, please contact me on my Telegram @makaki22 
 
 MIT License
