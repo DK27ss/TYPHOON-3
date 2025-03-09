@@ -9,6 +9,19 @@ Developped and maintained by [@DK27ss](https://github.com/DK27ss)
 Typhoon 3 is software that allows the interception of signals using an open-source ADSB (Automatic Dependent Surveillance-Broadcast) decoder and transcribes them onto an interactive map. 
 It also intercepts ATC (Air-Traffic-Control) communications, also sourced openly, and displays their locations on an interactive map.
 
+               -               -           PRIVATE & RESTRICTED USAGE ONLY !
+              -  -           -  -  
+              - -  -  ---  -  - -     Welcome to TYPH00n ©️ (v3.0)
+              -  -    ---    -  -   
+               -     -- --     -     Framework for intercept
+                     -+ +-             ATC (Air-Traffic-Control) &
+                    - +++ -               ADSB (Automatic-Dependent-Surveillance–Broadcast) &
+                   --     --                 ACARS (Aircraft-Communication-Addressing-Reporting-System).
+                   -  +++  -      
+                  -++     ++-         This framework was developed for
+                 --++     ++--              research purposes in collaboration with SUPERPOSE INTELLIGENCE.
+               -----------------      
+
 The interactive map supports various analysis methods, such as image overlay, and also provides the ability to draw geometric shapes or make distance measurements and more.
 
 ![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
