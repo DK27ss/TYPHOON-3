@@ -91,14 +91,14 @@ The driver and listening software are now installed ^^
 
 To install the required files correctly :
 
-    git clone https://github.com/DK27ss/TYPHOON-2
-    cd TYPHOON-2
+    git clone https://github.com/DK27ss/TYPHOON-3
+    cd TYPHOON-3
     python -m venv env
     source env/bin/activate
 
 To launch the parent application (TYPHOON2) :
 
-    python or python3 TYPHOON2.py
+    python or python3 TYPHOON3.py
 
 To launch the ADSB LISTENER (Dump1090 Decoder) :
 
