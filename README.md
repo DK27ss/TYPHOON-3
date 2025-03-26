@@ -56,30 +56,6 @@ View ATC listening channel frequencies bandwidth according to the stations selec
 
 ![ATC](https://github.com/user-attachments/assets/43ac1426-f86f-4ca9-acaa-f3378d35e078)
 
-                        <p><b>---- KDMA/KTUS TWR/OPS/ZAB</b></p>
-                        <p><b>139.725</b> 357FS Ops</p>
-                        <p><b>138.500</b> 358FS Ops</p>
-                        <p><b>327.150</b> Albuquerque Center (Sector 47 Silver City/Low/UHF)</p>
-                        <p><b>281.500</b> Albuquerque Center (Sector 90 San Simon/High/UHF)</p>
-                        <p><b>364.200</b> AWACS</p>
-                        <p><b>234.800</b> BigFoot</p>
-                        <p><b>271.000</b> BigFoot</p>
-                        <p><b>253.500</b> Davis-Monthan AFB</p>
-                        <p><b>392.200</b> Tucson 162FW SOS IOPS</p>
-                        <p><b>257.800</b> Tucson Tower (UHF)</p>
-                        <br>
-                        <p><b>---- KTUS DEL/GND/TWR/APP/KDMA</b></p>
-                        <p><b>118.850</b> KDMA Tower</p>
-                        <p><b>124.000</b> Tucson Approach (alt)</p>
-                        <p><b>125.100</b> Tucson Approach (East/South)</p>
-                        <p><b>269.550</b> Tucson Approach (Mil)</p>
-                        <p><b>119.400</b> Tucson Approach (North)</p>
-                        <p><b>125.900</b> Tucson Approach (Practice Areas)</p>
-                        <p><b>126.650</b> Tucson Clearance Delivery</p>
-                        <p><b>120.025</b> Tucson Ground</p>
-                        <p><b>118.300</b> Tucson Tower</p>
-                        <p><b>119.000</b> Tucson Tower (alt)</p>
-
 ## Usage:
 
 To install the USB driver for the SDR Dongle :
@@ -150,7 +126,7 @@ If you would like to contribute to the development of the project, please contac
 
 MIT License
 
-Copyright (c) [2024] [SUPERPOSE INT]
+Copyright (c) [2025] [SUPERPOSE INT]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
