@@ -1,5 +1,5 @@
 # TYPHOON-3
-ADSB &amp; ATC Interceptor for SIGINT (Signals Intelligence)&amp; IMINT (Imagery Intelligence) Missions.
+ADSB &amp; ATC Interceptor for SIGINT (Signals Intelligence) &amp; IMINT (Imagery Intelligence) Missions.
 
 Bêta version 3.0
 Developped and maintained by [@DK27ss](https://github.com/DK27ss)
