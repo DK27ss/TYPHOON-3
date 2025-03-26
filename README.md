@@ -11,7 +11,7 @@ It also intercepts ATC (Air-Traffic-Control) communications, also sourced openly
 
                -               -           PRIVATE & RESTRICTED USAGE ONLY !
               -  -           -  -  
-              - -  -  ---  -  - -     Welcome to TYPH00n ©️ (v3.0)
+              - -  -  ---  -  - -     Welcome to TYPHOON ©️ (v3.0)
               -  -    ---    -  -   
                -     -- --     -     Framework for intercept
                      -+ +-             ATC (Air-Traffic-Control) &
