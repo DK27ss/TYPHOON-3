@@ -42,13 +42,13 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
 
-## ADS-B
+## ADS-B (Automatic-Dependent-Surveillance–Broadcast):
 
 // Real-Time traffic & datas
 
 ![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
 
-## ATC
+## ATC (Air-Traffic-Control):
 
 // Frequency bandwidth
 
