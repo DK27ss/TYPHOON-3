@@ -26,7 +26,7 @@ The interactive map supports various analysis methods, such as image overlay, an
 
 ![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
 
-![Capture2](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c433e357-fb3d-4c50-b140-42ee0bc9c0d5)
+![Capture](https://github.com/user-attachments/assets/8226ac98-80bc-47bc-bd90-7aae0ddcee15)
 
 # Features:
 
