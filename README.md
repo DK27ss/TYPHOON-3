@@ -26,18 +26,18 @@ The interactive map supports various analysis methods, such as image overlay, an
 
 ![Capture](https://github.com/user-attachments/assets/8226ac98-80bc-47bc-bd90-7aae0ddcee15)
 
-# Features:
+# Maps features:
 
 The overlay of maps allows for precise analysis of areas and displays the map in geographical mode, adding location information on top. (Sensitive zones are not necessarily blurred on the maps)
 
 ![dfgdfg](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/077ad03b-b309-458f-8c3a-1cfef567875e)
 
-      MAPS FEATURES & SUPERPOSE Mods
+      MAPS FEATURES
 
-    - mountain        |     ADSB                                      
-    - altitude        |     ATC                               
-    - airports        |     ACARS  (soon..)                                 
-    - roads           |     AWACS  (soon..)
+    - mountain        |                                      
+    - altitude        |                              
+    - airports        |                                   
+    - roads           |     
     - harbours        |                                                 
     - buildings       |                                               
     - and more..      |  
