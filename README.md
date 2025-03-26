@@ -32,15 +32,13 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 ![dfgdfg](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/077ad03b-b309-458f-8c3a-1cfef567875e)
 
-      MAPS FEATURES
-
-    - mountain        |                                      
-    - altitude        |                              
-    - airports        |                                   
-    - roads           |     
-    - harbours        |                                                 
-    - buildings       |                                               
-    - and more..      |  
+    - mountain                                            
+    - altitude                                    
+    - airports                                         
+    - roads              
+    - harbours                                                    
+    - buildings                                                    
+    - and more..      
 
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
 
