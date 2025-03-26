@@ -48,7 +48,7 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 // ATC Frequency
 
-![ATC](https://github.com/user-attachments/assets/7df1cea5-42e1-4641-a2a5-84557d23088e)
+![ATC](https://github.com/user-attachments/assets/43ac1426-f86f-4ca9-acaa-f3378d35e078)
 
 ## Usage:
 
