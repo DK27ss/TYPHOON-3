@@ -6,8 +6,8 @@ Developped and maintained by [@DK27ss](https://github.com/DK27ss)
 
 ## Description:
 
-Typhoon 3 is software that allows the interception of signals using an open-source ADSB (Automatic Dependent Surveillance-Broadcast) decoder and transcribes them onto an interactive map. 
-It also intercepts ATC (Air-Traffic-Control) communications, also sourced openly, and displays their locations on an interactive map.
+Typhoon 3 is software that allows the `interception of signals` using an open-source `ADSB` (Automatic Dependent Surveillance-Broadcast) `decoder` and `transcribes` them onto an `interactive map`. 
+It also intercepts `ATC` (Air-Traffic-Control) `communications`, also sourced openly, and `displays` their `locations` on an `interactive map`.
 
                -               -           PRIVATE & RESTRICTED USAGE ONLY !
               -  -           -  -  
@@ -44,13 +44,13 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 ## ADS-B (Automatic-Dependent-Surveillance–Broadcast):
 
-// Real-Time traffic & datas
+// Real-Time traffic & datas decode with `dump1090`
 
 ![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
 
 ## ATC (Air-Traffic-Control):
 
-// Frequency bandwidth
+// Frequency bandwidth & Real-Time listening with `liveatc`
 
 View ATC listening channel frequencies bandwidth according to the stations selected (with MILILITARY)
 
@@ -58,11 +58,11 @@ View ATC listening channel frequencies bandwidth according to the stations selec
 
 ## Usage:
 
-To install the USB driver for the SDR Dongle :
+To install the `USB driver` for the `SDR Dongle` :
 
     sudo apt-get -fym install git cmake build=essential libusb-1.0-0-dev
 
-To download the SDR dongle reception software (the folders will be created and installed automatically) :
+To download the `SDR dongle` reception software (the folders will be created and installed automatically) :
 
      mkdir git
      git clone git://git.osmocom.org/rtl-sdr.git
@@ -78,8 +78,8 @@ Warning! In the event of a problem with CMAKE, and if you receive feedback indic
 
      sudo apt-get install cmake
 
-We're now going to disable the DVB driver. This is the driver used to receive television.
-It's of no interest to our experiment, as the frequency we'll be listening to is 1090 MHz. Way beyond TV frequencies.
+We're now going to disable the `DVB driver`. This is the driver used to receive television.
+It's of no interest to our experiment, as the frequency we'll be listening to is `1090 MHz`. Way beyond `TV frequencies`.
 To do this, we need to create an exception file. Let's create it with the following command :
 
      sudo nano /etc/modprobe.d/rtlsdr.conf
@@ -89,10 +89,10 @@ Add the following line to add the DVB receiver to the driver blacklist :
 
     blacklist dvb_usb_rtl28xxu
 
-To save the file, press CTRL-O and then ENTER.
-You can now close the text editor with the cross (or CTRL-X).
+To save the file, press `CTRL-O` and then `ENTER`.
+You can now close the text editor with the cross `(or CTRL-X)`.
 
-Since the DVB driver was probably loaded once during installation, you'll need to remove it before continuing.
+Since the `DVB driver` was probably loaded once during installation, you'll need to remove it before continuing.
 Type the following command :
 
     lsmod | grep dvb_usb_rtl28xxu
@@ -110,11 +110,11 @@ To launch the parent application (TYPHOON2) :
 
     python or python3 TYPHOON3.py
 
-To launch the ADSB LISTENER (Dump1090 Decoder) :
+To launch the `ADSB LISTENER` (Dump1090 Decoder) :
 
     python ./dump1090.py --interactive --net
 
-To view the interactive map on the localhost (127.0.0.1:8080) you can launch it using the map button in the parent application or directly enter the address in a search engine.
+To view the interactive map on the `localhost` `(127.0.0.1:8080)` you can launch it using the map button in the parent application or directly enter the address in a search engine.
 
 # Disclaimer
 
