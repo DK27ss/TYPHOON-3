@@ -46,6 +46,10 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
 
+// ATC Frequency
+
+![ATC](https://github.com/user-attachments/assets/7df1cea5-42e1-4641-a2a5-84557d23088e)
+
 ## Usage:
 
 To install the USB driver for the SDR Dongle :
