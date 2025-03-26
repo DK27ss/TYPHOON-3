@@ -24,8 +24,6 @@ It also intercepts ATC (Air-Traffic-Control) communications, also sourced openly
 
 The interactive map supports various analysis methods, such as image overlay, and also provides the ability to draw geometric shapes or make distance measurements and more.
 
-![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
-
 ![Capture](https://github.com/user-attachments/assets/8226ac98-80bc-47bc-bd90-7aae0ddcee15)
 
 # Features:
@@ -46,7 +44,15 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
 
-// ATC Frequency
+## ADS-B
+
+// Real-Time traffic & datas
+
+![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
+
+## ATC
+
+// Frequency
 
 ![ATC](https://github.com/user-attachments/assets/43ac1426-f86f-4ca9-acaa-f3378d35e078)
 
