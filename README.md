@@ -4,7 +4,7 @@ ADSB &amp; ATC Interceptor for SIGINT (Signals Intelligence) &amp; IMINT (Imager
 Bêta version 3.0
 Developped and maintained by [@DK27ss](https://github.com/DK27ss)
 
-## Description:
+## Overview
 
 Typhoon 3 is software that allows the `interception of signals` using an open-source `ADSB` (Automatic Dependent Surveillance-Broadcast) `decoder` and `transcribes` them onto an `interactive map`. 
 It also intercepts `ATC` (Air-Traffic-Control) `communications`, also sourced openly, and `displays` their `locations` on an `interactive map`.
@@ -26,7 +26,7 @@ The interactive map supports various analysis methods, such as image overlay, an
 
 ![Capture](https://github.com/user-attachments/assets/8226ac98-80bc-47bc-bd90-7aae0ddcee15)
 
-# Maps features:
+# Maps features
 
 The overlay of maps allows for precise analysis of areas and displays the map in geographical mode, adding location information on top. (Sensitive zones are not necessarily blurred on the maps)
 
@@ -42,13 +42,13 @@ The overlay of maps allows for precise analysis of areas and displays the map in
 
 ![x c](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/c955881a-cb02-4794-b8d2-50b064bbc1f2)
 
-## ADS-B (Automatic-Dependent-Surveillance–Broadcast):
+## ADS-B (Automatic-Dependent-Surveillance–Broadcast)
 
 // Real-Time traffic & datas decode with `dump1090`
 
 ![dump1](https://github.com/DK27ss/TYPHOON-2-/assets/134336163/66d87fa6-b96e-4fa2-a281-b1efa7893864)
 
-## ATC (Air-Traffic-Control):
+## ATC (Air-Traffic-Control)
 
 // Frequency bandwidth & Real-Time listening with `liveatc`
 
@@ -56,7 +56,7 @@ View ATC listening channel frequencies bandwidth according to the stations selec
 
 ![ATC](https://github.com/user-attachments/assets/43ac1426-f86f-4ca9-acaa-f3378d35e078)
 
-## Usage:
+## Usage
 
 To install the `USB driver` for the `SDR Dongle` :
 
